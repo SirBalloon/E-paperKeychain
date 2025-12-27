@@ -24,7 +24,7 @@
 GxEPD2_3C<GxEPD2_290_C90c, GxEPD2_290_C90c::HEIGHT> display(GxEPD2_290_C90c(EPD_CS, EPD_DC, EPD_RST, EPD_BUSY)); // GDEM029C90 128x296, SSD1680
 
 const char* ssid = "HoneuuuCinnamonRoll";
-const char* password = "MangoMisha21";
+const char* password = "Password1234";
 
 AsyncWebServer server(80);
 
