@@ -18,11 +18,11 @@ Key Features
 
 Below Videos are to show Progress and other styles I have experimented with. To download them click the embedded links below, then click the raw install to view a copy. Another way to view them is to visit my Portfolio. https://sirballoon.github.io/DevBook/ 
 
+
 [Case Iteration 1](Content/VID_20251212_205514_026.mp4)
 [Case Iteration 2](Content/VID_20251215_173922_935.mp4)
 [Different Material](Content/VID_20251225_041710_654.mp4)
 [No Lid Version](Content/VID_20251225_041716_174.mp4)
-
 
 ## 5. Hardware Requirements
 **Components:**
@@ -41,9 +41,13 @@ Below Videos are to show Progress and other styles I have experimented with. To 
 
 ## 7. Installation/Setup
 
-**Hardware Setup:**
+**Setup:**
 ```
 1. Grab the e-paper module and the esp32-s3-Zero
-2. Specifically  
-3. Connect power supply to VIN and GND
+2. Specifically connecting the Busy, Res, D/C, CS, SCL, SDA, GND and VCC to the correct ports as shown in Markdown File.
+3. Connect the esp32 to ur PC through a type-c cable allowing you to interface with the device
+4. Install the Code in the E-PaperServer.ino file
+5. Once compiled onto the esp32, everything should work. 
+6. 3d Print the enclosure. 
+
 [Include wiring diagram or link to /docs/wiring.md]
