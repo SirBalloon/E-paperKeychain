@@ -15,6 +15,7 @@ Key Features
 ## 4. Demo/Visual
 ![alt text](Content/DisplayExample1.png)
 ![alt text](Content/DisplayExample2.png)
+[📹 Case Iteration 1](Content/VID_20251212_205514_026.mp4)
 <video controls src="Content/VID_20251212_205514_026.mp4" title="Case Iteration 1"></video>
 <video controls src="Content/VID_20251215_173922_935.mp4" title="Case Iteration 2"></video>
 <video controls src="Content/VID_20251225_041710_654.mp4" title="Different Material"></video>
