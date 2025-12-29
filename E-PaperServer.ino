@@ -1,6 +1,5 @@
 /*
  * E-Paper Server for WeAct 2.9" EPD Display
- * This will help find the correct driver for your WeAct 2.9" display
  */
 
 #include <GxEPD2_3C.h>
