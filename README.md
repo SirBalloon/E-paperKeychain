@@ -43,7 +43,7 @@ Below Videos are to show Progress and other styles I have experimented with. To 
 
 **Hardware Setup:**
 ```
-1. Connect the e-paper module to pin PA1
-2. Connect ESP8266: TX->PA9, RX->PA10
+1. Grab the e-paper module and the esp32-s3-Zero
+2. Specifically  
 3. Connect power supply to VIN and GND
 [Include wiring diagram or link to /docs/wiring.md]
