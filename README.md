@@ -15,11 +15,13 @@ Key Features
 ## 4. Demo/Visual
 ![alt text](Content/DisplayExample1.png)
 ![alt text](Content/DisplayExample2.png)
-[📹 Case Iteration 1](Content/VID_20251212_205514_026.mp4)
-<!-- <video controls src="Content/VID_20251212_205514_026.mp4" title="Case Iteration 1"></video>
-<video controls src="Content/VID_20251215_173922_935.mp4" title="Case Iteration 2"></video>
-<video controls src="Content/VID_20251225_041710_654.mp4" title="Different Material"></video>
-<video controls src="Content/VID_20251225_041716_174.mp4" title="No Lid Version"></video> -->
+
+Below Videos are to show Progress and other styles I have experimented with. To download them click the embedded links below, then click the raw install to view a copy. Another way to view them is to visit my Portfolio. https://sirballoon.github.io/DevBook/ 
+[Case Iteration 1](Content/VID_20251212_205514_026.mp4)
+[Case Iteration 2](Content/VID_20251215_173922_935.mp4)
+[Different Material](Content/VID_20251225_041710_654.mp4)
+[No Lid Version](Content/VID_20251225_041716_174.mp4)
+
 
 ## 5. Hardware Requirements
 **Components:**
