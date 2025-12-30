@@ -3,16 +3,16 @@ Simple e-paper display linked to a esp32-s3-zero with a 3d printed encasement
 
 The goal of this project was to learn how to program and create projects with hardware. 
 
-## 2. Overview/Introduction
+## 1. Overview/Introduction
 This project was a fun idea I felt like would be an amazing gift or functional keychain that can be used in so many ways. I was in love with the ESLs at my local woolies, and got inspired to explore that technology as a result. Inherently this solution doesn't solve a problem, rather it tries to capture the benefits of e-paper displays and allow users to be either stylish(in black, white and red), show useful QRcodes or as a learning project from a hardware and software perspective. 
 
-## 3. Features
+## 2. Features
 Key Features
 - Web Server running off Esp32-s3-Zero
 - Retained display without power
 - Wifi Access point
 
-## 4. Demo/Visual
+## 3. Demo/Visual
 ![alt text](Content/DisplayExample1.png)
 ![alt text](Content/DisplayExample2.png)
 
@@ -24,7 +24,7 @@ Below Videos are to show Progress and other styles I have experimented with. To 
 [Different Material](Content/VID_20251225_041710_654.mp4)
 [No Lid Version](Content/VID_20251225_041716_174.mp4)
 
-## 5. Hardware Requirements
+## 4. Hardware Requirements
 **Components:**
 - Microcontroller: Esp32-s3-Zero 
 - Display - 2.9" E-paper module (black, White and Red)
@@ -35,11 +35,11 @@ Below Videos are to show Progress and other styles I have experimented with. To 
 - Soldering iron
 - PC with Arduino IDE
 
-## 6. Software Requirements
+## 5. Software Requirements
 - IDE: ArduinoIDE
 - Libraries: <GxEPD2_3C.h>, <Fonts/FreeMonoBold12pt7b.h>, <WiFi.h>, <ESPAsyncWebServer.h>, <AsyncTCP.h>
 
-## 7. Installation/Setup
+## 6. Installation/Setup
 
 **Setup:**
 ```
