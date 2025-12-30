@@ -13,8 +13,8 @@ Key Features
 - Wifi Access point
 
 ## 3. Demo/Visual
-![alt text](Content/DisplayExample1.png)
-![alt text](Content/WorkingImage.png)
+<img src="Content/WorkingImage.png" alt="Working Image" style="transform: rotate(90deg);" width="400">
+<img src="Content/DisplayExample1.png" alt="Display Example" style="transform: rotate(90deg);" width="400">
 
 Below Videos are to show Progress and other styles I have experimented with. To download them click the embedded links below, then click the raw install to view a copy. Another way to view them is to visit my Portfolio. https://sirballoon.github.io/DevBook/ 
 
