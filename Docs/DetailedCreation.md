@@ -1,6 +1,6 @@
 # E-paperKeychain Installation Guide with Explaination
 
-## Step 1 - 
+## Step 1 - Purchasing parts
 Purchase the parts, for the keychain I chose to buy these parts:
 
 - WeAct 2.9 inch e-paper display
@@ -10,7 +10,7 @@ Purchase the parts, for the keychain I chose to buy these parts:
 - Right Angled Pin headers
 
 
-## Step 2 - 
+## Step 2 - Wiring up Hardware
 Follow the wiring table below. This will allow the e-paper display and esp32 to talk to each other. 
 
 | E-Paper Display | ESP32-S3-Zero |
@@ -24,12 +24,15 @@ Follow the wiring table below. This will allow the e-paper display and esp32 to 
 | RST              | IO12 (pin 12) |
 | BUSY             | IO13 (pin 13) |
 
-## Step 3 - 
+## Step 3 - Upload Code to Esp32
 Once everything is wired, you can now install arduino IDE or any other alternative. After arduino IDE is installed, open the E-paperServer.ino file. You can tweak both the ssid and password for better and tailored security. Also feel free to edit anything allowing for further improvements. Once done editing, you can click the upload button with the esp32 connected to your PC via usb-c. This will upload the code onto the esp32. 
 
-## Step 4 - 
+## Step 4 - Test for any issues
 Now everything should be ready, test the software and hardware. Ensure everything works smoothly! 
 
 Things to be aware off:
 - The keychain is not meant to have power for long. 
 - When connecting to the wifi access point, you may need to turn off both the wifi and 5g data for it to work. 
+
+## Step 5 - 3D print the enclosure
+Final step is to take the STL files and either print them yourself, or find your local print farm/library. 
