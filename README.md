@@ -14,7 +14,7 @@ Key Features
 
 ## 3. Demo/Visual
 ![alt text](Content/DisplayExample1.png)
-![alt text](Content/DisplayExample2.png)
+![alt text](Content/WorkingImage.png)
 
 Below Videos are to show Progress and other styles I have experimented with. To download them click the embedded links below, then click the raw install to view a copy. Another way to view them is to visit my Portfolio. https://sirballoon.github.io/DevBook/ 
 
