@@ -1,0 +1,36 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <title>Surprise Gift!</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Surprise Gift!</h1>
+        <p class="subtitle">Upload an image to display on the e-paper screen</p>
+
+        <div class="upload-area" id="uploadArea">
+            <div class="upload-text">Click to upload image</div>
+            <div class="upload-hint">or drag and drop here</div>
+        </div>
+
+        <input type="file" id="fileInput" accept="image/*">
+
+        <div class="preview-container" id="previewContainer">
+            <img id="previewImage" class="preview-image" alt="Preview">
+        </div>
+
+        <button class="button" id="uploadButton" disabled>Upload to Display</button>
+
+        <div class="status" id="status"></div>
+    </div>
+
+    <canvas id="canvas"></canvas>
+    <script src="/script.js"></script>
+</body>
+
+</html>
