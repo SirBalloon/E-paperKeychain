@@ -2,6 +2,7 @@
  * E-Paper Server for WeAct 2.9" EPD Display
  */
 
+#include "config.h"
 #include <Arduino.h>
 #include <GxEPD2_3C.h>
 #include <Fonts/FreeMonoBold12pt7b.h>
@@ -9,23 +10,8 @@
 #include <ESPAsyncWebServer.h>
 #include <AsyncTCP.h>
 
-// Pin definitions
-#define EPD_MOSI 11
-#define EPD_SCK 12
-#define EPD_CS 10
-#define EPD_DC 9
-#define EPD_RST 8
-#define EPD_BUSY 7
-
-#define DISPLAY_WIDTH 296
-#define DISPLAY_HEIGHT 128
-
 // 2.9'' EPD Module - Considered a Template Class
 GxEPD2_3C<GxEPD2_290_C90c, GxEPD2_290_C90c::HEIGHT> display(GxEPD2_290_C90c(EPD_CS, EPD_DC, EPD_RST, EPD_BUSY)); // GDEM029C90 128x296, SSD1680
-
-// Webserver credentials
-const char *ssid = "HoneuuuCinnamonRoll";
-const char *password = "Password1234";
 
 // Sets up the Server on port 80
 AsyncWebServer server(80);
