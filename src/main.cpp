@@ -93,14 +93,7 @@ void setup()
 
   LittleFS.begin();
 
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
-            { request->send(LittleFS, "/index.html", "text/html"); });
-
-  server.on("/style.css", HTTP_GET, [](AsyncWebServerRequest *request)
-            { request->send(LittleFS, "/style.css", "text/css"); });
-
-  server.on("/script.js", HTTP_GET, [](AsyncWebServerRequest *request)
-            { request->send(LittleFS, "/script.js", "application/javascript"); });
+  server.serveStatic("/", LittleFS, "/").setDefaultFile("index.html");
 
   server.on("/upload", HTTP_POST, [](AsyncWebServerRequest *request)
             { request->send(200, "text/plain", "OK"); }, NULL, [](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total)
