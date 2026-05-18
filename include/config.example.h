@@ -11,6 +11,6 @@
 #define DISPLAY_WIDTH 296
 #define DISPLAY_HEIGHT 128
 
-// WiFi access point credentials
+// Webserver credentials - Make sure SSID is not bigger then 16 characters
 static const char *ssid = "YourNetworkName";
 static const char *password = "YourPassword";
