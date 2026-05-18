@@ -2,7 +2,12 @@
 #include "qr_display.h"
 #include "config.h"
 #include <qrcode.h>
-#include <Fonts/FreeMonoBold12pt7b.h>
+#include <Fonts/FreeMonoBold9pt7b.h>
+
+#define QR_SCALE 4
+#define QR_X_OFFSET 0
+#define QR_Y_OFFSET ((128 - (29 * QR_SCALE)) / 2)  // centers 116px QR vertically
+#define TEXT_X 122
 
 void Qr_display(GxEPD2_3C<GxEPD2_290_C90c, GxEPD2_290_C90c::HEIGHT> &display)
 {
@@ -17,11 +22,11 @@ void Qr_display(GxEPD2_3C<GxEPD2_290_C90c, GxEPD2_290_C90c::HEIGHT> &display)
     do
     {
         display.fillScreen(GxEPD_WHITE);
-        display.setFont(&FreeMonoBold12pt7b);
+        display.setFont(&FreeMonoBold9pt7b);
         display.setTextColor(GxEPD_BLACK);
-        display.setCursor(100, 30);
+        display.setCursor(TEXT_X, 45);
         display.println("Connect to:");
-        display.setCursor(100, 60);
+        display.setCursor(TEXT_X, 65);
         display.println(ssid);
 
         for (int y = 0; y < qrcode.size; y++)
@@ -30,7 +35,7 @@ void Qr_display(GxEPD2_3C<GxEPD2_290_C90c, GxEPD2_290_C90c::HEIGHT> &display)
             {
                 if (qrcode_getModule(&qrcode, x, y))
                 {
-                    display.fillRect(x * 3, y * 3, 3, 3, GxEPD_BLACK);
+                    display.fillRect(QR_X_OFFSET + x * QR_SCALE, QR_Y_OFFSET + y * QR_SCALE, QR_SCALE, QR_SCALE, GxEPD_BLACK);
                 }
             }
         }
