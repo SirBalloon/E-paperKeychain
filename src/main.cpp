@@ -3,10 +3,10 @@
  */
 
 #include "config.h"
+#include "qr_display.h"
 #include <Arduino.h>
 #include <LittleFS.h>
 #include <GxEPD2_3C.h>
-#include <Fonts/FreeMonoBold12pt7b.h>
 #include <WiFi.h>
 #include <ESPAsyncWebServer.h>
 #include <AsyncTCP.h>
@@ -85,11 +85,8 @@ void setup()
   WiFi.softAP(ssid, password);
 
   IPAddress IP = WiFi.softAPIP();
-  Serial.print("AP IP address: ");
-  Serial.println(IP);
-  Serial.print("Connect to WiFi: ");
-  Serial.println(ssid);
-  Serial.println("Then visit: http://192.168.4.1");
+
+  Qr_display(display);
 
   LittleFS.begin();
 
@@ -118,24 +115,6 @@ void setup()
       } });
 
   server.begin();
-
-  Serial.println("Updating display...");
-  display.setFullWindow();
-  display.firstPage();
-  do
-  {
-    display.fillScreen(GxEPD_WHITE);
-    display.setTextColor(GxEPD_BLACK);
-    display.setFont(&FreeMonoBold12pt7b);
-    display.setCursor(10, 30);
-    display.println("Connect to:");
-    display.setCursor(10, 60);
-    display.println(ssid);
-    display.setCursor(10, 90);
-    display.println("192.168.4.1");
-  } while (display.nextPage());
-
-  Serial.println("Setup complete!");
 }
 
 // This is the server loop which looks for if there are images to display
