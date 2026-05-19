@@ -152,7 +152,9 @@ void setup()
     MDNS.begin("epaper");
     MDNS.addService("http", "tcp", 80);
 
-    Qr_display(display, "http://epaper.local", "epaper.local", "Visit:");
+    String ipURL = "http://" + WiFi.localIP().toString();
+    String ipLabel = WiFi.localIP().toString();
+    Qr_display(display, ipURL.c_str(), "epaper.local", ipLabel.c_str(), "Visit:");
 
     server.serveStatic("/", LittleFS, "/").setDefaultFile("index.html");
     server.on("/upload", HTTP_POST, [](AsyncWebServerRequest *request)
@@ -187,7 +189,7 @@ void setup()
     WiFi.softAP("KeychainSetup");
     dnsServer.start(53, "*", WiFi.softAPIP());
 
-    Qr_display(display, "http://192.168.4.1", "KeychainSetup", "Connect to:");
+    Qr_display(display, "http://192.168.4.1", "KeychainSetup", "", "Connect to:");
 
     // Captive portal detection endpoints for Android, IOS/MacOS, Windows
     server.on("/generate_204", HTTP_GET, [](AsyncWebServerRequest *request)
@@ -207,7 +209,7 @@ void setup()
                               "Hotspot Name:<br><input name='ssid' type='text'><br><br>"
                               "Password:<br><input name='pass' type='password'><br><br>"
                               "<input type='submit' value='Connect'>"
-                              "</form></body></html>") });
+                              "</form></body></html>"); });
     server.on("/save", HTTP_POST, [](AsyncWebServerRequest *request)
               {
       if(request->hasParam("ssid", true) && request->hasParam("pass", true)){
