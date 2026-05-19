@@ -10,12 +10,18 @@
 #include <WiFi.h>
 #include <ESPAsyncWebServer.h>
 #include <AsyncTCP.h>
+#include <Preferences.h>
+#include <DNSServer.h>
+#include <ESPmDNS.h>
 
 // 2.9'' EPD Module - Considered a Template Class
 GxEPD2_3C<GxEPD2_290_C90c, GxEPD2_290_C90c::HEIGHT> display(GxEPD2_290_C90c(EPD_CS, EPD_DC, EPD_RST, EPD_BUSY)); // GDEM029C90 128x296, SSD1680
 
 // Sets up the Server on port 80
 AsyncWebServer server(80);
+DNSServer dnsServer;
+Preferences pref;
+bool isAPMode = false;
 
 // Buffer to store uploaded image data. Each pixel is 1 bit, we can pack 8 bits into a byte so the image (296*128 = 37,888)/8 = 4736 bytes.
 // Which is much more efficient then storing each pixel as a full byte or 4-byte RGBA Value
@@ -65,6 +71,34 @@ void displayUploadedImage(uint8_t *data, size_t len)
   Serial.println("Image displayed successfully!");
 }
 
+// Saving Web Credentials
+void saveCreds(const String &ssid, const String &pass)
+{
+  pref.begin("wifi", false);
+  pref.putString("ssid", ssid);
+  pref.putString("pass", pass);
+  pref.end();
+}
+
+// Loading Web Credentials
+bool loadCreds(String &ssid, String &pass)
+{
+  pref.begin("wifi", true);
+  ssid = pref.getString("ssid", "");
+  pass = pref.getString("pass", "");
+  pref.end();
+  return ssid.length() > 0;
+}
+
+// Clearing Web Credentials
+void clearCreds()
+{
+  pref.begin("wifi", false);
+  pref.clear();
+  pref.end();
+  Serial.println("Credentials cleared");
+}
+
 // This Function sets up the initial E-paper display allowing the user experience to start
 void setup()
 {
@@ -75,6 +109,12 @@ void setup()
 
   display.init(115200);
   display.setRotation(1);
+
+  pinMode(BOOT_BUTTON, INPUT_PULLUP);
+  if (digitalRead(BOOT_BUTTON) == LOW)
+  {
+    clearCreds();
+  }
 
   imageBuffer = (uint8_t *)malloc(IMAGE_BUFFER_SIZE);
   if (imageBuffer == nullptr)
