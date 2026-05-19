@@ -122,19 +122,39 @@ void setup()
     Serial.println("Failed to allocate image buffer!");
   }
 
-  WiFi.softAP(ssid, password);
-
-  IPAddress IP = WiFi.softAPIP();
-
-  Qr_display(display);
-
   LittleFS.begin();
 
-  server.serveStatic("/", LittleFS, "/").setDefaultFile("index.html");
+  // Saved Web Credentials
+  String savedSSID, savedPass;
 
-  server.on("/upload", HTTP_POST, [](AsyncWebServerRequest *request)
-            { request->send(200, "text/plain", "OK"); }, NULL, [](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total)
-            {
+  // loads the credentials and starts the wifi, gives 20 attempts before failing
+  if (loadCreds(savedSSID, savedPass))
+  {
+    WiFi.mode(WIFI_STA);
+    WiFi.begin(savedSSID.c_str(), savedPass.c_str());
+
+    int attempts = 0;
+    while (WiFi.status() != WL_CONNECTED && attempts < 20)
+    {
+      delay(500);
+      attempts++;
+      Serial.print(".");
+    }
+    Serial.println();
+  }
+
+  if (WiFi.status() == WL_CONNECTED)
+  {
+    Serial.printf("Connected! IP: %s\n", WiFi.localIP().toString().c_str());
+
+    // Step 6 here
+
+    // Step 7 here
+
+    server.serveStatic("/", LittleFS, "/").setDefaultFile("index.html");
+    server.on("/upload", HTTP_POST, [](AsyncWebServerRequest *request)
+              { request->send(200, "text/plain", "OK"); }, NULL, [](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total)
+              {
       if (index == 0) {
         totalReceived = 0;
         Serial.printf("Upload started, expecting %d bytes\n", total);
@@ -153,7 +173,16 @@ void setup()
           imageReadyToDisplay = true;
         }
       } });
+  }
+  else
+  {
+    isAPMode = true;
+    Serial.println("No credentials or connection failed — starting captive portal");
 
+    // Step 5 here
+  }
+
+  // Qr_display(display);
   server.begin();
 }
 
