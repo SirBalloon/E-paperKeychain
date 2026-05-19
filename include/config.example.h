@@ -1,4 +1,4 @@
-// Copy this file to config.h and fill in your values.
+// Copy this file to config.h
 
 // Pin definitions (ESP32-S3)
 #define EPD_MOSI 11
@@ -11,8 +11,3 @@
 
 #define DISPLAY_WIDTH 296
 #define DISPLAY_HEIGHT 128
-
-// OLD METHOD -
-// Webserver credentials - Make sure SSID is not bigger then 16 characters
-// static const char *ssid = "YourNetworkName";
-// static const char *password = "YourPassword";

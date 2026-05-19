@@ -22,10 +22,11 @@ AsyncWebServer server(80);
 DNSServer dnsServer;
 Preferences pref;
 bool isAPMode = false;
+bool shouldRestart = false
 
-// Buffer to store uploaded image data. Each pixel is 1 bit, we can pack 8 bits into a byte so the image (296*128 = 37,888)/8 = 4736 bytes.
-// Which is much more efficient then storing each pixel as a full byte or 4-byte RGBA Value
-const size_t IMAGE_BUFFER_SIZE = (DISPLAY_WIDTH * DISPLAY_HEIGHT) / 8; // 4,736 bytes
+    // Buffer to store uploaded image data. Each pixel is 1 bit, we can pack 8 bits into a byte so the image (296*128 = 37,888)/8 = 4736 bytes.
+    // Which is much more efficient then storing each pixel as a full byte or 4-byte RGBA Value
+    const size_t IMAGE_BUFFER_SIZE = (DISPLAY_WIDTH * DISPLAY_HEIGHT) / 8; // 4,736 bytes
 uint8_t *imageBuffer = nullptr;
 size_t totalReceived = 0;
 bool imageReadyToDisplay = false;
@@ -146,10 +147,12 @@ void setup()
   if (WiFi.status() == WL_CONNECTED)
   {
     Serial.printf("Connected! IP: %s\n", WiFi.localIP().toString().c_str());
+    isAPMode = false;
 
-    // Step 6 here
+    MDNS.begin("epaper");
+    MDNS.addService("http", "tcp", 80);
 
-    // Step 7 here
+    Qr_display(display, "http://epaper.local", "epaper.local", "Vist:");
 
     server.serveStatic("/", LittleFS, "/").setDefaultFile("index.html");
     server.on("/upload", HTTP_POST, [](AsyncWebServerRequest *request)
@@ -179,16 +182,61 @@ void setup()
     isAPMode = true;
     Serial.println("No credentials or connection failed — starting captive portal");
 
-    // Step 5 here
-  }
+    // Starts AP and DNS Server
+    WiFi.mode(WIFI_AP);
+    WiFi.softAP("KeychainSetup");
+    dnsServer.start(53, "*", WiFi.softAPIP());
 
-  // Qr_display(display);
+    Qr_display(display, "http://192.168.4.1", "KeychainSetup", "Connect to:");
+
+    // Captive portal detection endpoints for Android, IOS/MacOS, Windows
+    server.on("/generate_204", HTTP_GET, [](AsyncWebServerRequest *request)
+              { request->redirect("/"); });
+
+    server.on("/hotspot-detect.html", HTTP_GET, [](AsyncWebServerRequest *request)
+              { request->redirect("/"); });
+
+    server.on("/connecttest.txt", HTTP_GET, [](AsyncWebServerRequest *request)
+              { request->redirect("/"); });
+
+    server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
+              { request->send(200, "text/html",
+                              "<!DOCTYPE html><html><head><title>Keychain Setup</title></head>"
+                              "<body><h2>Keychain Setup</h2>"
+                              "<form action='/save' method='POST'>"
+                              "Hotspot Name:<br><input name='ssid' type='text'><br><br>"
+                              "Password:<br><input name='pass' type='password'><br><br>"
+                              "<input type='submit' value='Connect'>"
+                              "</form></body></html>") });
+    server.on("/save", HTTP_POST, [](AsyncWebServerRequest *request)
+              {
+      if(request->hasParam("ssid", true) && request->hasParam("pass", true)){
+        String newSSID = request->getParam("ssid", true)->value();
+        String newPass = request->getParam("pass", true)->value();
+        saveCreds(newSSID, newPass);
+        request->send(200, "text/html", "<h2>Saved! Device is restarting...</h2>");
+        shouldRestart = true;
+      }else{
+        request->send(400, "text/plain", "Missing fields");
+      } });
+  }
   server.begin();
 }
 
 // This is the server loop which looks for if there are images to display
 void loop()
 {
+  if (isAPMode)
+  {
+    dnsServer.processNextRequest();
+  }
+
+  if (shouldRestart)
+  {
+    delay(1000);
+    ESP.restart();
+  }
+
   if (imageReadyToDisplay)
   {
     imageReadyToDisplay = false;

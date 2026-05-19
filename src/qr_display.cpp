@@ -1,20 +1,19 @@
 // Function that displays a QR-code for the IP Address
 #include "qr_display.h"
-#include "config.h"
 #include <qrcode.h>
 #include <Fonts/FreeMonoBold9pt7b.h>
 
 #define QR_SCALE 4
 #define QR_X_OFFSET 0
-#define QR_Y_OFFSET ((128 - (29 * QR_SCALE)) / 2)  // centers 116px QR vertically
+#define QR_Y_OFFSET ((128 - (29 * QR_SCALE)) / 2) // centers 116px QR vertically
 #define TEXT_X 122
 
-void Qr_display(GxEPD2_3C<GxEPD2_290_C90c, GxEPD2_290_C90c::HEIGHT> &display)
+void Qr_display(GxEPD2_3C<GxEPD2_290_C90c, GxEPD2_290_C90c::HEIGHT> &display, const char *url, const char *label, const char *instruction)
 {
     uint8_t qrBytes[qrcode_getBufferSize(3)];
 
     QRCode qrcode;
-    qrcode_initText(&qrcode, qrBytes, 3, ECC_MEDIUM, "http://192.168.4.1");
+    qrcode_initText(&qrcode, qrBytes, 3, ECC_MEDIUM, url);
 
     display.setFullWindow();
     display.firstPage();
@@ -25,9 +24,9 @@ void Qr_display(GxEPD2_3C<GxEPD2_290_C90c, GxEPD2_290_C90c::HEIGHT> &display)
         display.setFont(&FreeMonoBold9pt7b);
         display.setTextColor(GxEPD_BLACK);
         display.setCursor(TEXT_X, 45);
-        display.println("Connect to:");
+        display.println(instruction);
         display.setCursor(TEXT_X, 65);
-        display.println(ssid);
+        display.println(label);
 
         for (int y = 0; y < qrcode.size; y++)
         {
