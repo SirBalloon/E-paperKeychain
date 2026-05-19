@@ -22,11 +22,11 @@ AsyncWebServer server(80);
 DNSServer dnsServer;
 Preferences pref;
 bool isAPMode = false;
-bool shouldRestart = false
+bool shouldRestart = false;
 
-    // Buffer to store uploaded image data. Each pixel is 1 bit, we can pack 8 bits into a byte so the image (296*128 = 37,888)/8 = 4736 bytes.
-    // Which is much more efficient then storing each pixel as a full byte or 4-byte RGBA Value
-    const size_t IMAGE_BUFFER_SIZE = (DISPLAY_WIDTH * DISPLAY_HEIGHT) / 8; // 4,736 bytes
+// Buffer to store uploaded image data. Each pixel is 1 bit, we can pack 8 bits into a byte so the image (296*128 = 37,888)/8 = 4736 bytes.
+// Which is much more efficient then storing each pixel as a full byte or 4-byte RGBA Value
+const size_t IMAGE_BUFFER_SIZE = (DISPLAY_WIDTH * DISPLAY_HEIGHT) / 8; // 4,736 bytes
 uint8_t *imageBuffer = nullptr;
 size_t totalReceived = 0;
 bool imageReadyToDisplay = false;
@@ -152,7 +152,7 @@ void setup()
     MDNS.begin("epaper");
     MDNS.addService("http", "tcp", 80);
 
-    Qr_display(display, "http://epaper.local", "epaper.local", "Vist:");
+    Qr_display(display, "http://epaper.local", "epaper.local", "Visit:");
 
     server.serveStatic("/", LittleFS, "/").setDefaultFile("index.html");
     server.on("/upload", HTTP_POST, [](AsyncWebServerRequest *request)
