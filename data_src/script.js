@@ -110,7 +110,7 @@ function floydSteinbergDithering(imageData) {
             data[idx] = data[idx + 1] = data[idx + 2] = newPixel;
 
             if (x + 1 < width) {
-                data[idx + 4] += error * 7 / 16;
+                data[idx + 4] = Math.max(0, Math.min(255, data[idx + 4] + error * 7 / 16));
             }
             if (y + 1 < height) {
                 if (x > 0) {
