@@ -20,7 +20,7 @@ Things to improve:
     - Better preview accuracy -: canvas preview doesn't account for the e-paper contrast characteristics
 
     Architecture:
-    - Presistant Storage: Save to SPIFFS (ESP32 internal flash filesystem) so the previous image can redraw on startup
+    - Presistant Storage: Save to LittleFS (ESP32 internal flash filesystem) so the previous image can redraw on startup
     - Chunked Rendering: Current pixel by pixel loop is slow. The GxEDP2 library supports writing raw bitmap buffers directly which would be significantly faster
     - mDNS: Instead of using the Ip address, Setting up an mDNS allows them to visit a string based URL. Making it much friendlier
 
@@ -28,14 +28,6 @@ Things to improve:
     - Wifi Password should be protected and properly secure.
     - No rate limiting on /Upload
     - Consider adding a simple token or pin at the upload endpoint
-
-
-Goals:
-1. Provide a better image quality, focusing on black and white
-2. Implement Chunked Rendering
-3. Add mDNS for better architecture
-4. 
-
 
 Core Issue with E-Paper displays:
 - 296 x 128 Pixels is very low resolution 
