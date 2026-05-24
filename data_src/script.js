@@ -78,7 +78,9 @@ function processImage(img) {
     ctx.drawImage(img, offsetX, offsetY, scaledWidth, scaledHeight);
 
     const imageData = ctx.getImageData(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
-    const dithered = floydSteinbergDithering(imageData);
+    const gray = Grayscale(imageData);
+    const stretched = contrastStretch(gray)
+    const dithered = floydSteinbergDithering(stretched);
 
     ctx.putImageData(dithered, 0, 0);
     previewImage.src = canvas.toDataURL();
@@ -90,15 +92,46 @@ function processImage(img) {
     showStatus('Image processed! Ready to upload', 'success');
 }
 
-function floydSteinbergDithering(imageData) {
+function Grayscale(imageData) {
     const data = imageData.data;
-    const width = imageData.width;
-    const height = imageData.height;
 
     for (let i = 0; i < data.length; i += 4) {
         const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
         data[i] = data[i + 1] = data[i + 2] = gray;
     }
+
+    return imageData;
+}
+
+function contrastStretch(imageData) {
+    const data = imageData.data;
+    let min = 255;
+    let max = 0;
+
+    for (let i = 0; i < data.length; i += 4) {
+        if (data[i] < min) {
+            min = data[i];
+        }
+        if (data[i] > max) {
+            max = data[i];
+        }
+    }
+
+    if (min === max) {
+        return imageData;
+    }
+
+    for (let i = 0; i < data.length; i += 4) {
+        data[i] = data[i + 1] = data[i + 2] = (data[i] - min) / (max - min) * 255;
+    }
+
+    return imageData;
+}
+
+function floydSteinbergDithering(imageData) {
+    const data = imageData.data;
+    const width = imageData.width;
+    const height = imageData.height;
 
     for (let y = 0; y < height; y++) {
         for (let x = 0; x < width; x++) {
@@ -114,11 +147,11 @@ function floydSteinbergDithering(imageData) {
             }
             if (y + 1 < height) {
                 if (x > 0) {
-                    data[idx + (width * 4) - 4] += error * 3 / 16;
+                    data[idx + (width * 4) - 4] = Math.max(0, Math.min(255, data[idx + (width * 4) - 4] + error * 3 / 16));
                 }
-                data[idx + (width * 4)] += error * 5 / 16;
+                data[idx + (width * 4)] = Math.max(0, Math.min(255, data[idx + (width * 4)] + error * 5 / 16));
                 if (x + 1 < width) {
-                    data[idx + (width * 4) + 4] += error * 1 / 16;
+                    data[idx + (width * 4) + 4] = Math.max(0, Math.min(255, data[idx + (width * 4) + 4] + error * 1 / 16));
                 }
             }
         }
