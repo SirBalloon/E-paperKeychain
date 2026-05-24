@@ -80,7 +80,7 @@ function processImage(img) {
     const imageData = ctx.getImageData(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
     const gray = Grayscale(imageData);
     const stretched = contrastStretch(gray)
-    const gammaCorrected = gammaCorrection(stretched)
+    const gammaCorrected = gammaCorrection(stretched, 0.8);
     const dithered = floydSteinbergDithering(gammaCorrected);
 
     ctx.putImageData(dithered, 0, 0);
