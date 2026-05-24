@@ -80,7 +80,8 @@ function processImage(img) {
     const imageData = ctx.getImageData(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
     const gray = Grayscale(imageData);
     const stretched = contrastStretch(gray)
-    const dithered = floydSteinbergDithering(stretched);
+    const gammaCorrected = gammaCorrection(stretched)
+    const dithered = floydSteinbergDithering(gammaCorrected);
 
     ctx.putImageData(dithered, 0, 0);
     previewImage.src = canvas.toDataURL();
@@ -123,6 +124,16 @@ function contrastStretch(imageData) {
 
     for (let i = 0; i < data.length; i += 4) {
         data[i] = data[i + 1] = data[i + 2] = (data[i] - min) / (max - min) * 255;
+    }
+
+    return imageData;
+}
+
+function gammaCorrection(imageData, gamma) {
+    const data = imageData.data;
+
+    for (let i = 0; i < data.length; i += 4) {
+        data[i] = data[i + 1] = data[i + 2] = Math.pow(data[i] / 255, gamma) * 255;
     }
 
     return imageData;
