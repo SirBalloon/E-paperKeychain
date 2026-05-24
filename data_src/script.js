@@ -82,7 +82,8 @@ function processImage(img) {
     const stretched = contrastStretch(gray)
     const gammaCorrected = gammaCorrection(stretched, 0.8);
     const Sharpenedmask = unSharpMask(gammaCorrected, 1.5);
-    const dithered = floydSteinbergDithering(Sharpenedmask);
+    const edgeMap = detectEdges(Sharpenedmask);
+    const dithered = floydSteinbergDithering(Sharpenedmask, edgeMap);
 
     ctx.putImageData(dithered, 0, 0);
     previewImage.src = canvas.toDataURL();
@@ -179,7 +180,36 @@ function unSharpMask(imageData, amount) {
     return imageData;
 }
 
-function floydSteinbergDithering(imageData) {
+function detectEdges(imageData) {
+    const data = imageData.data;
+    const width = imageData.width;
+    const height = imageData.height;
+    const edgeMap = new Float32Array(width * height);
+
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+            let gx = 0;
+            let gy = 0;
+            for (let dy = -1; dy <= 1; dy++) {
+                for (let dx = -1; dx <= 1; dx++) {
+                    const nx = x + dx;
+                    const ny = y + dy;
+
+                    if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+                        const pixel = data[(ny * width + nx) * 4];
+                        gx += pixel * dx;
+                        gy += pixel * dy;
+                    }
+                }
+            }
+            edgeMap[y * width + x] = Math.sqrt(gx * gx + gy * gy);
+        }
+    }
+
+    return edgeMap;
+}
+
+function floydSteinbergDithering(imageData, edgeMap) {
     const data = imageData.data;
     const width = imageData.width;
     const height = imageData.height;
@@ -189,22 +219,28 @@ function floydSteinbergDithering(imageData) {
             const idx = (y * width + x) * 4;
             const oldPixel = data[idx];
             const newPixel = oldPixel < 128 ? 0 : 255;
+            const edgeStr = edgeMap[y * width + x];
             const error = oldPixel - newPixel;
 
-            data[idx] = data[idx + 1] = data[idx + 2] = newPixel;
+            if (edgeStr > 30) {
+                data[idx] = data[idx + 1] = data[idx + 2] = data[idx] < 128 ? 0 : 255;
+            } else {
+                data[idx] = data[idx + 1] = data[idx + 2] = newPixel;
 
-            if (x + 1 < width) {
-                data[idx + 4] = Math.max(0, Math.min(255, data[idx + 4] + error * 7 / 16));
-            }
-            if (y + 1 < height) {
-                if (x > 0) {
-                    data[idx + (width * 4) - 4] = Math.max(0, Math.min(255, data[idx + (width * 4) - 4] + error * 3 / 16));
-                }
-                data[idx + (width * 4)] = Math.max(0, Math.min(255, data[idx + (width * 4)] + error * 5 / 16));
                 if (x + 1 < width) {
-                    data[idx + (width * 4) + 4] = Math.max(0, Math.min(255, data[idx + (width * 4) + 4] + error * 1 / 16));
+                    data[idx + 4] = Math.max(0, Math.min(255, data[idx + 4] + error * 7 / 16));
+                }
+                if (y + 1 < height) {
+                    if (x > 0) {
+                        data[idx + (width * 4) - 4] = Math.max(0, Math.min(255, data[idx + (width * 4) - 4] + error * 3 / 16));
+                    }
+                    data[idx + (width * 4)] = Math.max(0, Math.min(255, data[idx + (width * 4)] + error * 5 / 16));
+                    if (x + 1 < width) {
+                        data[idx + (width * 4) + 4] = Math.max(0, Math.min(255, data[idx + (width * 4) + 4] + error * 1 / 16));
+                    }
                 }
             }
+
         }
     }
 
