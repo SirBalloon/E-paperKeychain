@@ -227,17 +227,21 @@ function floydSteinbergDithering(imageData, edgeMap) {
             } else {
                 data[idx] = data[idx + 1] = data[idx + 2] = newPixel;
 
-                if (x + 1 < width) {
-                    data[idx + 4] = Math.max(0, Math.min(255, data[idx + 4] + error * 7 / 16));
-                }
+                if (x + 1 < width)
+                    data[idx + 4] = Math.max(0, Math.min(255, data[idx + 4] + error / 8));
+                if (x + 2 < width)
+                    data[idx + 8] = Math.max(0, Math.min(255, data[idx + 8] + error / 8));
+
                 if (y + 1 < height) {
-                    if (x > 0) {
-                        data[idx + (width * 4) - 4] = Math.max(0, Math.min(255, data[idx + (width * 4) - 4] + error * 3 / 16));
-                    }
-                    data[idx + (width * 4)] = Math.max(0, Math.min(255, data[idx + (width * 4)] + error * 5 / 16));
-                    if (x + 1 < width) {
-                        data[idx + (width * 4) + 4] = Math.max(0, Math.min(255, data[idx + (width * 4) + 4] + error * 1 / 16));
-                    }
+                    if (x > 0)
+                        data[idx + (width * 4) - 4] = Math.max(0, Math.min(255, data[idx + (width * 4) - 4] + error / 8));
+                    data[idx + (width * 4)] = Math.max(0, Math.min(255, data[idx + (width * 4)] + error / 8));
+                    if (x + 1 < width)
+                        data[idx + (width * 4) + 4] = Math.max(0, Math.min(255, data[idx + (width * 4) + 4] + error / 8));
+                }
+
+                if (y + 2 < height) {
+                    data[idx + (width * 8)] = Math.max(0, Math.min(255, data[idx + (width * 8)] + error / 8));
                 }
             }
 
