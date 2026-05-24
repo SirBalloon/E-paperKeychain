@@ -81,7 +81,8 @@ function processImage(img) {
     const gray = Grayscale(imageData);
     const stretched = contrastStretch(gray)
     const gammaCorrected = gammaCorrection(stretched, 0.8);
-    const dithered = floydSteinbergDithering(gammaCorrected);
+    const Sharpenedmask = unSharpMask(gammaCorrected, 1.5);
+    const dithered = floydSteinbergDithering(Sharpenedmask);
 
     ctx.putImageData(dithered, 0, 0);
     previewImage.src = canvas.toDataURL();
@@ -134,6 +135,45 @@ function gammaCorrection(imageData, gamma) {
 
     for (let i = 0; i < data.length; i += 4) {
         data[i] = data[i + 1] = data[i + 2] = Math.pow(data[i] / 255, gamma) * 255;
+    }
+
+    return imageData;
+}
+
+function unSharpMask(imageData, amount) {
+    const data = imageData.data
+    const width = imageData.width;
+    const height = imageData.height;
+    const blurred = ctx.createImageData(imageData.width, imageData.height);
+
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+            let sum = 0;
+            let count = 0;
+            for (let dy = -1; dy <= 1; dy++) {
+                for (let dx = -1; dx <= 1; dx++) {
+                    const nx = x + dx;
+                    const ny = y + dy;
+
+                    if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+                        const nIdx = (ny * width + nx) * 4;
+                        sum += data[nIdx];
+                        count++;
+                    }
+                }
+            }
+            const idx = (y * width + x) * 4;
+            blurred.data[idx] = blurred.data[idx + 1] = blurred.data[idx + 2] = sum / count;
+            blurred.data[idx + 3] = 255;
+        }
+    }
+
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+            const idx = (y * width + x) * 4;
+            const newValue = Math.max(0, Math.min(255, data[idx] + amount * (data[idx] - blurred.data[idx])));
+            data[idx] = data[idx + 1] = data[idx + 2] = newValue;
+        }
     }
 
     return imageData;
