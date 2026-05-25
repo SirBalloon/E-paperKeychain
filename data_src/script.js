@@ -63,27 +63,78 @@ function handleFile(file) {
     reader.readAsDataURL(file);
 }
 
+function sinc(x) {
+    if (x === 0) {
+        return 1;
+    } else {
+        return Math.sin(Math.PI * x) / (Math.PI * x);
+    }
+}
+
+function lanczos(x) {
+    if (Math.abs(x) >= 2) {
+        return 0;
+    } else {
+        return sinc(x) * sinc(x / 2);
+    }
+}
+
+function lanczosResampling(img) {
+    const offscreen = document.createElement('canvas');
+    const offCtx = offscreen.getContext('2d');
+
+    offscreen.width = img.width;
+    offscreen.height = img.height;
+
+    offCtx.drawImage(img, 0, 0);
+    const srcData = offCtx.getImageData(0, 0, img.width, img.height).data;
+
+    const output = new Uint8ClampedArray(DISPLAY_WIDTH * DISPLAY_HEIGHT * 4);
+    const xRatio = img.width / DISPLAY_WIDTH;
+    const yRatio = img.height / DISPLAY_HEIGHT;
+
+    for (let oy = 0; oy < DISPLAY_HEIGHT; oy++) {
+        for (let ox = 0; ox < DISPLAY_WIDTH; ox++) {
+            const sx = ox * xRatio;
+            const sy = oy * yRatio;
+            let r = 0, g = 0, b = 0, totalWeight = 0;
+
+            for (let ky = -1; ky <= 2; ky++) {
+                for (let kx = -1; kx <= 2; kx++) {
+                    const px = Math.floor(sx) + kx;
+                    const py = Math.floor(sy) + ky;
+                    if (px >= 0 && px < img.width && py >= 0 && py < img.height) {
+                        const weight = lanczos(sx - px) * lanczos(sy - py);
+                        const srcIdx = (py * img.width + px) * 4;
+                        r += srcData[srcIdx] * weight;
+                        g += srcData[srcIdx + 1] * weight;
+                        b += srcData[srcIdx + 2] * weight;
+                        totalWeight += weight;
+                    }
+                }
+            }
+            const outIdx = (oy * DISPLAY_WIDTH + ox) * 4;
+            output[outIdx] = Math.max(0, Math.min(255, r / totalWeight));
+            output[outIdx + 1] = Math.max(0, Math.min(255, g / totalWeight));
+            output[outIdx + 2] = Math.max(0, Math.min(255, b / totalWeight));
+            output[outIdx + 3] = 255;
+        }
+    }
+
+    return new ImageData(output, DISPLAY_WIDTH, DISPLAY_HEIGHT);
+}
+
 function processImage(img) {
     canvas.width = DISPLAY_WIDTH;
     canvas.height = DISPLAY_HEIGHT;
 
-    const scale = Math.min(DISPLAY_WIDTH / img.width, DISPLAY_HEIGHT / img.height);
-    const scaledWidth = img.width * scale;
-    const scaledHeight = img.height * scale;
-    const offsetX = (DISPLAY_WIDTH - scaledWidth) / 2;
-    const offsetY = (DISPLAY_HEIGHT - scaledHeight) / 2;
-
-    ctx.fillStyle = 'white';
-    ctx.fillRect(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
-    ctx.drawImage(img, offsetX, offsetY, scaledWidth, scaledHeight);
-
-    const imageData = ctx.getImageData(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
+    const imageData = lanczosResampling(img);
     const gray = Grayscale(imageData);
     const stretched = contrastStretch(gray)
-    const gammaCorrected = gammaCorrection(stretched, 0.8);
-    const Sharpenedmask = unSharpMask(gammaCorrected, 1.5);
+    const gammaCorrected = gammaCorrection(stretched, 0.9);
+    const Sharpenedmask = unSharpMask(gammaCorrected, 1.0);
     const edgeMap = detectEdges(Sharpenedmask);
-    const dithered = floydSteinbergDithering(Sharpenedmask, edgeMap);
+    const dithered = AtkinsonDithering(Sharpenedmask, edgeMap);
 
     ctx.putImageData(dithered, 0, 0);
     previewImage.src = canvas.toDataURL();
@@ -209,7 +260,7 @@ function detectEdges(imageData) {
     return edgeMap;
 }
 
-function floydSteinbergDithering(imageData, edgeMap) {
+function AtkinsonDithering(imageData, edgeMap) {
     const data = imageData.data;
     const width = imageData.width;
     const height = imageData.height;
