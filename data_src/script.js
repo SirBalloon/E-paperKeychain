@@ -8,6 +8,10 @@ const previewImage = document.getElementById('previewImage');
 const uploadButton = document.getElementById('uploadButton');
 const status = document.getElementById('status');
 const canvas = document.getElementById('canvas');
+const gammaSlider = document.getElementById('gammaSlider');
+const sharpnessSlider = document.getElementById('sharpnessSlider');
+const edgeSlider = document.getElementById('edgeSlider');
+const controls = document.getElementById('controls');
 const ctx = canvas.getContext('2d');
 
 let processedImageData = null;
@@ -90,13 +94,17 @@ function lanczosResampling(img) {
     const srcData = offCtx.getImageData(0, 0, img.width, img.height).data;
 
     const output = new Uint8ClampedArray(DISPLAY_WIDTH * DISPLAY_HEIGHT * 4);
-    const xRatio = img.width / DISPLAY_WIDTH;
-    const yRatio = img.height / DISPLAY_HEIGHT;
+    const scale = Math.max(DISPLAY_WIDTH / img.width, DISPLAY_HEIGHT / img.height);
+    const scaledW = img.width * scale;
+    const scaledH = img.height * scale;
+    const offsetX = (DISPLAY_WIDTH - scaledW) / 2;
+    const offsetY = (DISPLAY_HEIGHT - scaledH) / 2;
 
     for (let oy = 0; oy < DISPLAY_HEIGHT; oy++) {
         for (let ox = 0; ox < DISPLAY_WIDTH; ox++) {
-            const sx = ox * xRatio;
-            const sy = oy * yRatio;
+            const sx = (ox - offsetX) / scale;
+            const sy = (oy - offsetY) / scale;
+
             let r = 0, g = 0, b = 0, totalWeight = 0;
 
             for (let ky = -1; ky <= 2; ky++) {
@@ -128,18 +136,22 @@ function processImage(img) {
     canvas.width = DISPLAY_WIDTH;
     canvas.height = DISPLAY_HEIGHT;
 
+    const gamma = parseFloat(gammaSlider.value);
+    const sharpness = parseFloat(sharpnessSlider.value);
+    const edgeThreshold = parseInt(edgeSlider.value);
+
     const imageData = lanczosResampling(img);
     const gray = Grayscale(imageData);
     const stretched = contrastStretch(gray)
-    const gammaCorrected = gammaCorrection(stretched, 0.9);
-    const Sharpenedmask = unSharpMask(gammaCorrected, 1.0);
+    const gammaCorrected = gammaCorrection(stretched, gamma);
+    const Sharpenedmask = unSharpMask(gammaCorrected, sharpness);
     const edgeMap = detectEdges(Sharpenedmask);
-    const dithered = AtkinsonDithering(Sharpenedmask, edgeMap);
+    const dithered = AtkinsonDithering(Sharpenedmask, edgeMap, edgeThreshold);
 
     ctx.putImageData(dithered, 0, 0);
     previewImage.src = canvas.toDataURL();
     previewContainer.style.display = 'block';
-
+    controls.style.display = 'block';
     processedImageData = packImageData(dithered);
 
     uploadButton.disabled = false;
@@ -260,7 +272,7 @@ function detectEdges(imageData) {
     return edgeMap;
 }
 
-function AtkinsonDithering(imageData, edgeMap) {
+function AtkinsonDithering(imageData, edgeMap, edgeThreshold) {
     const data = imageData.data;
     const width = imageData.width;
     const height = imageData.height;
@@ -273,7 +285,7 @@ function AtkinsonDithering(imageData, edgeMap) {
             const edgeStr = edgeMap[y * width + x];
             const error = oldPixel - newPixel;
 
-            if (edgeStr > 30) {
+            if (edgeStr > edgeThreshold) {
                 data[idx] = data[idx + 1] = data[idx + 2] = data[idx] < 128 ? 0 : 255;
             } else {
                 data[idx] = data[idx + 1] = data[idx + 2] = newPixel;
@@ -360,6 +372,21 @@ uploadButton.addEventListener('click', async () => {
         uploadButton.disabled = false;
         uploadButton.textContent = 'Upload to Display';
     }
+});
+
+gammaSlider.addEventListener('input', () => {
+    document.getElementById('gammaValue').textContent = gammaSlider.value;
+    if (currentImg) processImage(currentImg);
+});
+
+sharpnessSlider.addEventListener('input', () => {
+    document.getElementById('sharpnessValue').textContent = sharpnessSlider.value;
+    if (currentImg) processImage(currentImg);
+});
+
+edgeSlider.addEventListener('input', () => {
+    document.getElementById('edgeValue').textContent = edgeSlider.value;
+    if (currentImg) processImage(currentImg);
 });
 
 function showStatus(message, type) {
